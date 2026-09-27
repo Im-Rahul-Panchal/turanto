@@ -112,6 +112,9 @@ export const imageRegistry = {
   'offer-bogo': require('@/assets/images/offers/offer-bogo.png'),
   'offer-best-discounts': require('@/assets/images/offers/offer-best-discounts.png'),
   'offer-weekend-specials': require('@/assets/images/offers/offer-weekend-specials.png'),
+  // brand & logo
+  'turanto-logo': require('@/assets/images/logo/turanto-logo.png'),
+  'turanto-mark': require('@/assets/images/logo/turanto-mark.png'),
   // illustrations
   'empty-cart': require('@/assets/images/illustrations/empty-cart.png'),
   'empty-orders': require('@/assets/images/illustrations/empty-orders.png'),
@@ -133,4 +136,28 @@ export type ImageKey = keyof typeof imageRegistry;
 export function getImage(key: ImageKey): ImageSourcePropType {
   return imageRegistry[key];
 }
+
+/** Structured centralized asset mapping for convenient hierarchical access */
+export const assets = {
+  logo: {
+    primary: imageRegistry['turanto-logo'],
+    mark: imageRegistry['turanto-mark'],
+  },
+  illustrations: {
+    emptyCart: imageRegistry['empty-cart'],
+    emptyOrders: imageRegistry['empty-orders'],
+    emptyFavorites: imageRegistry['empty-favorites'],
+    emptySearch: imageRegistry['empty-search'],
+    emptyAddresses: imageRegistry['empty-addresses'],
+    orderSuccess: imageRegistry['order-success'],
+    errorState: imageRegistry['error-state'],
+  },
+  avatars: {
+    user: imageRegistry['avatar-user'],
+  },
+  placeholders: {
+    product: imageRegistry['placeholder-product'],
+    generic: imageRegistry['placeholder-generic'],
+  },
+} as const;
 

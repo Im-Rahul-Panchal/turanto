@@ -1,11 +1,14 @@
 import { useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
+import { Image } from 'expo-image';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { CategoryCard } from '@/components/category/category-card';
 import { FlashDealCard, OfferBanner } from '@/components/offers/offer-banner';
 import { ProductRail } from '@/components/product/product-rail';
-import { IconButton } from '@/components/ui/icon-button';
+import { Icon } from '@/components/ui/icon';
+import { PressScale } from '@/components/ui/press-scale';
 import { SearchField } from '@/components/ui/search-field';
 import { SectionHeader } from '@/components/ui/section-header';
 import { Text } from '@/components/ui/text';
@@ -17,8 +20,9 @@ import {
   offers,
   products,
 } from '@/data';
+import { getImage } from '@/lib/images';
 import { useUser } from '@/providers/user-provider';
-import { colors, gutter, spacing } from '@/theme';
+import { colors, gutter, radius, spacing } from '@/theme';
 import type { Product } from '@/types';
 
 /**
@@ -29,6 +33,7 @@ import type { Product } from '@/types';
  * windowed — the right trade-off for a feed this compositionally dense.
  */
 export default function HomeScreen() {
+  const insets = useSafeAreaInsets();
   const { user, selectedAddress, labelFor } = useUser();
   const [query, setQuery] = useState('');
 
@@ -64,10 +69,38 @@ export default function HomeScreen() {
   return (
     <ScrollView
       style={styles.root}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm }]}
       showsVerticalScrollIndicator={false}
       keyboardShouldPersistTaps="handled">
       <View style={styles.header}>
+        {/* Top Brand Bar: Logo & Address */}
+        <View style={styles.brandRow}>
+          <Image
+            source={getImage('turanto-logo')}
+            style={styles.brandLogo}
+            contentFit="contain"
+            accessibilityLabel="Turanto"
+          />
+
+          <PressScale
+            onPress={() => router.push('/addresses')}
+            accessibilityRole="button"
+            accessibilityLabel={`Deliver to ${addressLine}`}
+            scaleTo={0.96}
+            style={styles.addressPill}>
+            <Icon name="map-pin" size={14} color={colors.primaryDark} />
+            <View style={styles.addressTextWrap}>
+              <Text variant="overline" color={colors.primaryDark} lines={1}>
+                {selectedAddress ? labelFor(selectedAddress.label) : 'Deliver to'}
+              </Text>
+              <Text variant="caption" color={colors.textSecondary} lines={1}>
+                {selectedAddress?.city ?? 'Select area'}
+              </Text>
+            </View>
+            <Icon name="chevron-down" size={12} color={colors.textMuted} />
+          </PressScale>
+        </View>
+
         <View style={styles.topRow}>
           <View style={styles.greeting}>
             <Text variant="caption" lines={1}>
@@ -77,12 +110,6 @@ export default function HomeScreen() {
               What are you buying today?
             </Text>
           </View>
-
-          <IconButton
-            name="map-pin"
-            accessibilityLabel={`Deliver to ${addressLine}`}
-            onPress={() => router.push('/addresses')}
-          />
         </View>
 
         <SearchField
@@ -186,13 +213,37 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: gutter,
-    gap: spacing.base,
+    gap: spacing.md,
+  },
+  brandRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: spacing.xs,
+  },
+  brandLogo: {
+    width: 140,
+    height: 42,
+  },
+  addressPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    backgroundColor: colors.surface,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.pill,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border,
+    maxWidth: 160,
+  },
+  addressTextWrap: {
+    flexShrink: 1,
   },
   topRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: spacing.base,
   },
   greeting: {
     flex: 1,
@@ -212,8 +263,9 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   categoryCell: {
-    // Two per row with the shared gap handled by the container.
-    width: '47.8%',
+    // Two per row with flexBasis and flexGrow
+    flexBasis: '47.5%',
+    flexGrow: 1,
   },
   dealRow: {
     paddingHorizontal: gutter,
